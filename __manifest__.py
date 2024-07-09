@@ -8,6 +8,7 @@
     'category': 'Custom',
     'depends': ['base'],
     'external_dependencies': {
+        'python': ['stimula'],
     },
     'data': [
         # List of XML or CSV files to be loaded
