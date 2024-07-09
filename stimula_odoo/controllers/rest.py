@@ -6,7 +6,8 @@ Author: Romke Jonker
 Email: romke@rnadesign.net
 """
 import logging
-import os
+import random
+import string
 import traceback
 from functools import wraps
 
@@ -21,8 +22,6 @@ from odoo.modules.registry import Registry
 from .odoo_auth import OdooAuth
 
 _logger = logging.getLogger(__name__)
-_auth = OdooAuth(os.environ.get('SECRET_KEY'))
-_db = DB(None)
 
 
 def exception_handler(f):
@@ -69,7 +68,7 @@ def authentication_handler(f):
         token = authorization_header[len('Bearer '):]
 
         # validate the token
-        database, uid = _auth.validate_token(token)
+        database, uid = StimulaController._auth.validate_token(token)
 
         cnx_context.database = database
         cnx_context.uid = uid
@@ -100,6 +99,25 @@ def connection_handler(f):
 
 
 class StimulaController(http.Controller):
+    def __init__(self):
+        StimulaController._auth = OdooAuth(self.get_secret_key())
+        self._db = DB(None)
+
+    def get_secret_key(self):
+        SECRET_KEY = 'stimula_odoo.secret_key'
+
+        # get odoo configuration parameter from database
+        if not self.get_param(SECRET_KEY):
+            # create random secret key if not already set
+            self.set_param(SECRET_KEY, ''.join(random.choices(string.ascii_letters + string.digits, k=16)))
+
+        return self.get_param(SECRET_KEY)
+
+    def get_param(self, key, default=None):
+        return http.request.env['ir.config_parameter'].sudo().get_param(key, default)
+
+    def set_param(self, key, value):
+        http.request.env['ir.config_parameter'].sudo().set_param(key, value)
 
     @http.route('/stimula/1.0/hello', type='http', auth='none', methods=['GET'], csrf=False)
     def hello(self):
@@ -110,7 +128,7 @@ class StimulaController(http.Controller):
     @exception_handler
     def authenticate(self, **post):
         # authenticate the posted credentials. Always validate we can connect.
-        token = _auth.authenticate(post['database'], post['username'], post['password'])
+        token = self._auth.authenticate(post['database'], post['username'], post['password'])
 
         # return the token
         return request.make_json_response({'token': token})
@@ -124,7 +142,7 @@ class StimulaController(http.Controller):
 
         # optional query parameter to filter results
         q_param = query.get('q')
-        tables = _db.get_tables(q_param)
+        tables = self._db.get_tables(q_param)
         return request.make_json_response(tables)
 
     @http.route('/stimula/1.0/tables/<string:table_name>/header', type='http', auth='none', methods=['GET'], csrf=False)
@@ -140,13 +158,13 @@ class StimulaController(http.Controller):
         assert style_param in [None, '', 'csv', 'json'], 'Invalid style parameter'
 
         if style_param == 'csv':
-            csv_header = _db.get_header_csv(table_name, h_param)
+            csv_header = self._db.get_header_csv(table_name, h_param)
             response = request.make_response(csv_header)
             response.headers['Content-Type'] = 'text/csv'
             response.headers['Content-Disposition'] = 'attachment; filename=mydata.csv'
             return response
 
-        json_header = _db.get_header_json(table_name, h_param)
+        json_header = self._db.get_header_json(table_name, h_param)
         return request.make_json_response(json_header)
 
     @http.route('/stimula/1.0/tables/<string:table_name>/count', type='http', auth='none', methods=['GET'], csrf=False)
@@ -160,7 +178,7 @@ class StimulaController(http.Controller):
         # where clause is optional, use to restrict returned rows
         q_param = query.get('q')
 
-        count = _db.get_count(table_name, h_param, q_param)
+        count = self._db.get_count(table_name, h_param, q_param)
         return request.make_json_response({'count': count})
 
     @http.route('/stimula/1.0/tables/<string:table_name>', type='http', auth='none', methods=['GET'], csrf=False)
@@ -175,7 +193,7 @@ class StimulaController(http.Controller):
         where_clause = query.get('q')
 
         # get table contents, use header if provided, create default header otherwise
-        csv_output = _db.get_table_as_csv(table_name, header, where_clause)
+        csv_output = self._db.get_table_as_csv(table_name, header, where_clause)
 
         # Create a response object with CSV data and appropriate headers
         response = request.make_response(csv_output)
@@ -212,18 +230,18 @@ class StimulaController(http.Controller):
 
         if style == 'diff':
             # get diff, create sql and execute if requested and return three data frames separated by two newlines
-            post_result = _db.post_table_get_diff(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
+            post_result = self._db.post_table_get_diff(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
             response_body = '\n\n'.join([df.to_csv(index=False) for df in post_result])
 
         if style == 'sql':
             # get diff, create sql, execute if requested and return a single data frame
-            post_result = _db.post_table_get_sql(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
+            post_result = self._db.post_table_get_sql(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
             # convert df to response body, use double quotes where needed
             response_body = post_result.to_csv(index=False, quotechar="\"")
 
         if style == 'summary':
             # get diff, create sql, execute if requested and return a summary in json format
-            post_result = _db.post_table_get_summary(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
+            post_result = self._db.post_table_get_summary(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
             # convert df to response body, use double quotes where needed
             response_body = post_result
 
