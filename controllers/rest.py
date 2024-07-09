@@ -1,3 +1,10 @@
+"""
+This script provides the Stimula REST controller. It takes care of handling requests, parsing parameters and invoking the Stimula library.
+It wraps each call with handlers for authentication, database connection and exceptions.
+
+Author: Romke Jonker
+Email: romke@rnadesign.net
+"""
 import logging
 import os
 import traceback

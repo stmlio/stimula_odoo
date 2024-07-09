@@ -1,3 +1,9 @@
+"""
+This script class provides an Odoo specific implementation of the Auth class.
+
+Author: Romke Jonker
+Email: romke@rnadesign.net
+"""
 from stimula.services.auth import Auth
 
 from odoo.modules.registry import Registry
