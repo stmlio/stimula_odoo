@@ -12,8 +12,8 @@ import traceback
 from functools import wraps
 
 from sqlalchemy import create_engine
-from stimula.services.context import cnx_context
-from stimula.services.db import DB
+from stimula.service.context import cnx_context
+from stimula.service.db import DB
 
 from odoo import http
 from odoo.exceptions import AccessDenied
@@ -101,7 +101,7 @@ def connection_handler(f):
 class StimulaController(http.Controller):
     def __init__(self):
         StimulaController._auth = OdooAuth(self.get_secret_key())
-        self._db = DB(None)
+        self._db = DB()
 
     def get_secret_key(self):
         SECRET_KEY = 'stimula_odoo.secret_key'
