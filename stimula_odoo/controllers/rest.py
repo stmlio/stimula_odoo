@@ -222,6 +222,7 @@ class StimulaController(http.Controller):
         execute = bool(eval(query.get('execute', 'false').capitalize()))
         commit = bool(eval(query.get('commit', 'false').capitalize()))
         deduplicate = bool(eval(query.get('deduplicate', 'false').capitalize()))
+        context = query.get('context')
         body = request.httprequest.data.decode('utf-8')
         assert body, 'Missing body content'
 
@@ -261,7 +262,7 @@ class StimulaController(http.Controller):
 
         if style == 'full':
             # get diff, create sql, execute if requested and return a full report in json format
-            post_result = self._db.post_table_get_full_report(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
+            post_result = self._db.post_table_get_full_report(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit, context=context)
             # create json response
             response = request.make_json_response(post_result)
             return response
