@@ -215,7 +215,7 @@ class StimulaController(http.Controller):
 
         style = query.get('style')
         skiprows = int(query.get('skiprows', 0))
-        assert style in ['diff', 'sql', 'result'], 'style must be one of diff, sql or result'
+        assert style in ['diff', 'sql', 'result', 'full'], 'style must be one of diff, sql, result or full'
         insert = bool(eval(query.get('insert', 'false').capitalize()))
         update = bool(eval(query.get('update', 'false').capitalize()))
         delete = bool(eval(query.get('delete', 'false').capitalize()))
@@ -231,26 +231,39 @@ class StimulaController(http.Controller):
 
         if style == 'diff':
             # get diff, create sql and execute if requested and return three data frames separated by two newlines
-            post_result = self._db.post_table_get_diff(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit, deduplicate=deduplicate)
+            post_result = self._db.post_table_get_diff(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit,
+                                                       deduplicate=deduplicate)
             response_body = '\n\n'.join([df.to_csv(index=False) for df in post_result])
+            # Set headers
+            response = request.make_response(response_body)
+            response.headers['Content-Type'] = 'text/csv'
+            response.headers['Content-Disposition'] = 'attachment; filename=mydata.csv'
+            return response
 
         if style == 'sql':
             # get diff, create sql, execute if requested and return a single data frame
-            post_result = self._db.post_table_get_sql(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit, deduplicate=deduplicate)
+            post_result = self._db.post_table_get_sql(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit,
+                                                      deduplicate=deduplicate)
             # convert df to response body, use double quotes where needed
             response_body = post_result.to_csv(index=False, quotechar="\"")
+            # Set headers
+            response = request.make_response(response_body)
+            response.headers['Content-Type'] = 'text/csv'
+            response.headers['Content-Disposition'] = 'attachment; filename=mydata.csv'
+            return response
 
         if style == 'summary':
             # get diff, create sql, execute if requested and return a summary in json format
             post_result = self._db.post_table_get_summary(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
             # convert df to response body, use double quotes where needed
-            response_body = post_result
+            response = request.make_response(post_result)
+            return response
 
-            # Create a response object with CSV data and appropriate headers
+        if style == 'full':
+            # get diff, create sql, execute if requested and return a full report in json format
+            post_result = self._db.post_table_get_full_report(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
+            # create json response
+            response = request.make_json_response(post_result)
+            return response
 
-        # Create a response object with CSV data and appropriate headers
-        response = request.make_response(response_body)
-        response.headers['Content-Type'] = 'text/csv'
-        response.headers['Content-Disposition'] = 'attachment; filename=mydata.csv'
-
-        return response
+        raise Exception(f'Invalid style parameter: {style}')
