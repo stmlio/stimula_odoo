@@ -122,7 +122,7 @@ class StimulaController(http.Controller):
     @http.route('/stimula/1.0/hello', type='http', auth='none', methods=['GET'], csrf=False)
     def hello(self):
         _logger.info('hello')
-        return 'Hello world!!'
+        return 'This is the Stimula REST API.'
 
     @http.route('/stimula/1.0/auth', type='http', auth='none', methods=['POST'], csrf=False)
     @exception_handler
