@@ -262,9 +262,46 @@ class StimulaController(http.Controller):
 
         if style == 'full':
             # get diff, create sql, execute if requested and return a full report in json format
-            post_result = self._db.post_table_get_full_report(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit, context=context)
+            post_result = self._db.post_table_get_full_report(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit,
+                                                              context=context)
             # create json response
             response = request.make_json_response(post_result)
             return response
 
         raise Exception(f'Invalid style parameter: {style}')
+
+    @http.route('/stimula/1.0/tables', type='http', auth='none', methods=['POST'], csrf=False)
+    @exception_handler
+    @authentication_handler
+    @connection_handler
+    def post_tables(self, **query):
+        tables = query.get('t')
+        # header is optional
+        header = query.get('h')
+
+        insert = bool(eval(query.get('insert', 'false').capitalize()))
+        update = bool(eval(query.get('update', 'false').capitalize()))
+        delete = bool(eval(query.get('delete', 'false').capitalize()))
+        execute = bool(eval(query.get('execute', 'false').capitalize()))
+        commit = bool(eval(query.get('commit', 'false').capitalize()))
+
+        # get files from multipart request body
+        files = request.httprequest.files
+
+        # get context names from filenames
+        context = [file.filename for file in files.values()]
+
+        # get contents from files
+        contents = [file.stream.read() for file in files.values()]
+
+        # verify that table names were given for all files
+        assert tables is not None, "Provide table names using the '-t' parameter"
+        table_list = tables.split(',')
+        assert tables is not None and len(table_list) == len(files), "Provide exactly one file per table, not %s" % len(files)
+
+        # get diff, create sql, execute if requested and return a full report in json format
+        post_result = self._db.post_multiple_tables_get_full_report(table_list, header, None, contents, skiprows=1, insert=insert, update=update, delete=delete, execute=execute, commit=commit,
+                                                                    context=context)
+        # create json response
+        response = request.make_json_response(post_result)
+        return response
