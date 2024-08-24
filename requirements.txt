@@ -1,4 +1,4 @@
-stimula>=0.0.14
+stimula>=0.0.15
 pandas>=2.1.3
 numpy>=1.22.4
 
