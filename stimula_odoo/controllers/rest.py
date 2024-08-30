@@ -221,7 +221,6 @@ class StimulaController(http.Controller):
         delete = bool(eval(query.get('delete', 'false').capitalize()))
         execute = bool(eval(query.get('execute', 'false').capitalize()))
         commit = bool(eval(query.get('commit', 'false').capitalize()))
-        deduplicate = bool(eval(query.get('deduplicate', 'false').capitalize()))
         context = query.get('context')
         body = request.httprequest.data.decode('utf-8')
         assert body, 'Missing body content'
@@ -232,8 +231,7 @@ class StimulaController(http.Controller):
 
         if style == 'diff':
             # get diff, create sql and execute if requested and return three data frames separated by two newlines
-            post_result = self._db.post_table_get_diff(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit,
-                                                       deduplicate=deduplicate)
+            post_result = self._db.post_table_get_diff(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
             response_body = '\n\n'.join([df.to_csv(index=False) for df in post_result])
             # Set headers
             response = request.make_response(response_body)
@@ -243,8 +241,7 @@ class StimulaController(http.Controller):
 
         if style == 'sql':
             # get diff, create sql, execute if requested and return a single data frame
-            post_result = self._db.post_table_get_sql(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit,
-                                                      deduplicate=deduplicate)
+            post_result = self._db.post_table_get_sql(table_name, header, where_clause, body, skiprows=skiprows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
             # convert df to response body, use double quotes where needed
             response_body = post_result.to_csv(index=False, quotechar="\"")
             # Set headers
