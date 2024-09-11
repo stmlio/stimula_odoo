@@ -12,8 +12,8 @@ from odoo.service import security
 
 class OdooAuth(Auth):
     # set the secret key during instantiation
-    def __init__(self, secret_key):
-        super().__init__(secret_key)
+    def __init__(self, secret_key, lifetime=900):
+        super().__init__(secret_key, lifetime)
 
     def _validate_submitted_credentials(self, database, username, password):
         registry = Registry(database)

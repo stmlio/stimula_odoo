@@ -11,6 +11,7 @@ import string
 import traceback
 from functools import wraps
 
+from jwt import InvalidSignatureError
 from sqlalchemy import create_engine
 from stimula.service.context import cnx_context
 from stimula.service.db import DB
@@ -44,7 +45,7 @@ def exception_handler(f):
             }
 
             # get specific error status
-            error_status = 401 if isinstance(e, AccessDenied) else 400
+            error_status = 401 if isinstance(e, AccessDenied) or isinstance(e, InvalidSignatureError) else 400
 
             return request.make_json_response(error_object, status=error_status)
 
@@ -100,7 +101,7 @@ def connection_handler(f):
 
 class StimulaController(http.Controller):
     def __init__(self):
-        StimulaController._auth = OdooAuth(self.get_secret_key())
+        StimulaController._auth = OdooAuth(self.get_secret_key(), self.get_token_lifetime())
         self._db = DB()
 
     def get_secret_key(self):
@@ -112,6 +113,17 @@ class StimulaController(http.Controller):
             self.set_param(SECRET_KEY, ''.join(random.choices(string.ascii_letters + string.digits, k=16)))
 
         return self.get_param(SECRET_KEY)
+
+    def get_token_lifetime(self):
+        TOKEN_LIFETIME = 'stimula_odoo.token_lifetime'
+
+        # get odoo configuration parameter from database
+        if not self.get_param(TOKEN_LIFETIME):
+            # set token lifetime if not already set
+            self.set_param(TOKEN_LIFETIME, '900')
+
+        # return as integer
+        return int(self.get_param(TOKEN_LIFETIME))
 
     def get_param(self, key, default=None):
         return http.request.env['ir.config_parameter'].sudo().get_param(key, default)
