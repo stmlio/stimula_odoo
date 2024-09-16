@@ -16,7 +16,7 @@ from sqlalchemy import create_engine
 from stimula.service.context import cnx_context
 from stimula.service.db import DB
 
-from odoo import http
+from odoo import http, api, registry
 from odoo.exceptions import AccessDenied
 from odoo.http import request
 from odoo.modules.registry import Registry
@@ -101,35 +101,42 @@ def connection_handler(f):
 
 class StimulaController(http.Controller):
     def __init__(self):
-        StimulaController._auth = OdooAuth(self.get_secret_key(), self.get_token_lifetime())
+        # create an OdooAuth object with functions to retrieve secret key and token lifetime
+        StimulaController._auth = OdooAuth(self.get_secret_key, self.get_token_lifetime)
         self._db = DB()
 
-    def get_secret_key(self):
-        SECRET_KEY = 'stimula_odoo.secret_key'
+    def get_secret_key(self, database):
+        key = 'stimula_odoo.secret_key'
+        # generator to create a default random secret key
+        default_generator = lambda: ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+        return self.get_or_set_param(database, key, default_generator)
 
-        # get odoo configuration parameter from database
-        if not self.get_param(SECRET_KEY):
-            # create random secret key if not already set
-            self.set_param(SECRET_KEY, ''.join(random.choices(string.ascii_letters + string.digits, k=16)))
+    def get_token_lifetime(self, database):
+        key = 'stimula_odoo.token_lifetime'
+        default_generator = lambda: '900'
+        return int(self.get_or_set_param(database, key, default_generator))
 
-        return self.get_param(SECRET_KEY)
+    def get_or_set_param(self, database, key, default_generator):
+        registry_instance = registry(database)
+        with registry_instance.cursor() as cr:
+            env = api.Environment(cr, 1, {})
+            config_params = env['ir.config_parameter']
+            # get odoo configuration parameter from database
+            if not config_params.get_param(key):
+                # set default if not already set
+                config_params.set_param(key, default_generator)
 
-    def get_token_lifetime(self):
-        TOKEN_LIFETIME = 'stimula_odoo.token_lifetime'
-
-        # get odoo configuration parameter from database
-        if not self.get_param(TOKEN_LIFETIME):
-            # set token lifetime if not already set
-            self.set_param(TOKEN_LIFETIME, '900')
-
-        # return as integer
-        return int(self.get_param(TOKEN_LIFETIME))
+            return config_params.get_param(key)
 
     def get_param(self, key, default=None):
-        return http.request.env['ir.config_parameter'].sudo().get_param(key, default)
+        env = http.request.env
+        assert env, 'Environment not set, is a database available?'
+        return env['ir.config_parameter'].sudo().get_param(key, default)
 
     def set_param(self, key, value):
-        http.request.env['ir.config_parameter'].sudo().set_param(key, value)
+        env = http.request.env
+        assert env, 'Environment not set, is a database available?'
+        env['ir.config_parameter'].sudo().set_param(key, value)
 
     @http.route('/stimula/1.0/hello', type='http', auth='none', methods=['GET'], csrf=False)
     def hello(self):
