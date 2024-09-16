@@ -12,7 +12,7 @@ from odoo.service import security
 
 class OdooAuth(Auth):
     # set the secret key during instantiation
-    def __init__(self, secret_key_function, lifetime_function=lambda: 900):
+    def __init__(self, secret_key_function, lifetime_function):
         super().__init__(secret_key_function, lifetime_function)
 
     def _validate_submitted_credentials(self, database, username, password):
