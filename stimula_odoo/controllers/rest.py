@@ -123,8 +123,10 @@ class StimulaController(http.Controller):
             config_params = env['ir.config_parameter']
             # get odoo configuration parameter from database
             if not config_params.get_param(key):
+                # generate default value
+                default = default_generator()
                 # set default if not already set
-                config_params.set_param(key, default_generator)
+                config_params.set_param(key, default)
 
             return config_params.get_param(key)
 
