@@ -148,8 +148,23 @@ class StimulaController(http.Controller):
     @http.route('/stimula/1.0/auth', type='http', auth='none', methods=['POST'], csrf=False)
     @exception_handler
     def authenticate(self, **post):
+        # get database from form data
+        database = post.get('database')
+
+        # if no database is provided, then try to resolve based on the request context.
+        # This is useful when running in a single-database configuration when it's not easy to find the database name,
+        # like on an odoo.sh production build.
+        if not database:
+            # and if this request is served from a db context
+            if hasattr(request, 'env') and hasattr(request.env, 'cr') and hasattr(request.env.cr, 'dbname'):
+                # then use the current db context
+                database = request.env.cr.dbname
+            else:
+                # otherwise, raise an exception
+                raise Exception('No database provided. Either provide a database parameter or run this request from a single database configuration.')
+
         # authenticate the posted credentials. Always validate we can connect.
-        token = self._auth.authenticate(post['database'], post['username'], post['password'])
+        token = self._auth.authenticate(database, post['username'], post['password'])
 
         # return the token
         return request.make_json_response({'token': token})
