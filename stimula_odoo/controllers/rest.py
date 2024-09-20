@@ -113,7 +113,8 @@ class StimulaController(http.Controller):
 
     def get_token_lifetime(self, database):
         key = 'stimula_odoo.token_lifetime'
-        default_generator = lambda: '900'
+        # generator to create a default token lifetime of 24 hours
+        default_generator = lambda: 60 * 60 * 24
         return int(self.get_or_set_param(database, key, default_generator))
 
     def get_or_set_param(self, database, key, default_generator):
