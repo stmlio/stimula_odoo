@@ -4,14 +4,11 @@
     'depends': ['base'],
     'author': 'Romke Jonker',
     'category': 'Extra Tools',
-    'summary': 'Zero code data import, export and migration with Simple Table Mapping Language (STML) API for Odoo.',
+    'summary': 'Easy data import, export and migration with Simple Table Mapping Language (STML) for Odoo.',
     'description': '''
-    The Stimula for Odoo module provides a zero code data import, export and migration solution for Odoo using the 
-    Simple Table Mapping Language (STML) API. STML is a simple, human-readable language that allows you to define 
-    data mappings between different systems. The Stimula for Odoo module allows you to import data from, 
-    export data to, and migrate data between systems without writing any code. The module is designed 
-    to be easy to use, flexible, and extensible. The module is built on top of the Stimula library, which provides a 
-    set of tools for working with STML. The Stimula for Odoo module is open source and free to use. 
+    STML, or Simple Table Mapping Language, is a simple, human readable language designed for mapping data between CSV files 
+    and SQL databases. It forms the foundation for data import and export, enabling data analysts and developers 
+    to define fields, transformations, foreign key resolutions, and row selections in a simple, repeatable, and reusable way.
     For more information, visit https://www.stml.io/odoo_module.
     ''',
     'website': 'https://www.stml.io/odoo_module',
@@ -23,5 +20,6 @@
     'installable': True,
     'license': 'LGPL-3',
     'support': 'support@stml.io',
+    'images': ['static/description/banner.png'],
 }
 # __manifest__.py
