@@ -1,50 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Stimula for Odoo</title>
-    <style>
-        h1 {
-            font-size: 24px; /* Reducing the default size of h1 */
-        }
-
-        h2 {
-            font-size: 20px; /* Reducing the default size of h1 */
-        }
-    </style>
-</head>
-<body>
-
-
-<h1>Stimula for Odoo</h1>
-<h2>Easy data import, export and migration with STML.</h2>
+<h1 style="font-size: 24px;">Stimula for Odoo</h1>
+<h2 style="font-size: 20px;">Easy data import, export and migration with STML.</h2>
 <p>
     STML, or Simple Table Mapping Language, is a standardized language designed for mapping data between CSV files and SQL databases. It forms the foundation for data import and export,
     enabling data analysts and developers to define fields, transformations, foreign key resolutions, and row selections in a simple, repeatable, and reusable way. </p>
-<h1>Local Installation</h1>
-<h2>Follow the steps below to install the Stimula for Odoo module on a local Odoo instance:</h2>
+<h1 style="font-size: 24px;">Local Installation</h1>
+<h2 style="font-size: 20px;">Follow the steps below to install the Stimula for Odoo module on a local Odoo instance:</h2>
 <p>1. Copy the stimula_odoo folder into your addons folder in Odoo.</p>
 <p>2. Restart Odoo.</p>
 <p>3. Login to Odoo and activate the stimula_odoo module.</p>
 <p>4. Use the following endpoint to verify the module was installed correctly: <a href="http://localhost:8069/stimula/1.0/hello">http://localhost:8069/stimula/1.0/hello</a></p>
-<h1>Installation on odoo.sh</h1>
-<h2>Follow the steps below to install the Stimula for Odoo module on Odoo.sh:</h2>
+<h1 style="font-size: 24px;">Installation on odoo.sh</h1>
+<h2 style="font-size: 20px;">Follow the steps below to install the Stimula for Odoo module on Odoo.sh:</h2>
 <p>1. Add the Stimula for Odoo module to your list of repositories. You can do this by forking or cloning the following repository: <a href="https://github.com/stmlio/stimula_odoo">https://github.com/stmlio/stimula_odoo </a>
 </p>
 <p>2. Create a project on odoo.sh and trigger a new build. This will automatically activate the module.</p>
 <p>3. Login to Odoo and activate the module.</p>
 <p>4. Use the following endpoint to verify the module was installed correctly: <a href="https://your-database-name.dev.odoo.com/stimula/1.0/hello">https://your-database-name.dev.odoo.com</a></p>
-<h1>Optional configuration</h1>
-<h2>The module supports the following system configuration parameters:</h2>
+<h1 style="font-size: 24px;">Optional configuration</h1>
+<h2 style="font-size: 20px;">The module supports the following system configuration parameters:</h2>
 <p><b>stimula_odoo.secret_key</b>: This is the secret key to encrypt and sign access tokens. Thee module automatically generates a random secret key during first use.</p>
 <p><b>stimula_odoo.token_lifetime</b>: This is the access token lifetime in seconds. The default value is 24 hours.</p>
-<h1>Multi tenant setup</h1>
-<h2>This module supports a multi-tenant configuration with multiple databases per Odoo instance.</h2>
+<h1 style="font-size: 24px;">Multi tenant setup</h1>
+<h2 style="font-size: 20px;">This module supports a multi-tenant configuration with multiple databases per Odoo instance.</h2>
 <p>If you're planning to run multiple databases in your Odoo instance, then make sure that the module’s endpoints are available
     across all database by adding the module to your list of server-wide modules in odoo.conf. For example as follows:</p>
 <p>server_wide_modules = web,stimula_odoo</p>
 <p>In a multi-tenant setup, each database has its own secret key. By default the secret keys are different on eacht database, so a user can use a Stimula access token only on a single database.
     If you’ve added stimula_odoo to your list of server-wide modules, then it is no longer needed to separately activate the module in your database.</p>
-
-
-</body>
