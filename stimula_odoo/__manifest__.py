@@ -2,7 +2,7 @@
     'name': 'Stimula for Odoo',
     'version': '1.0.0',
     'depends': ['base'],
-    'author': 'Romke Jonker',
+    'author': 'STML.IO',
     'category': 'Extra Tools',
     'summary': 'Easy data import, export and migration with Simple Table Mapping Language (STML) for Odoo.',
     'description': '''

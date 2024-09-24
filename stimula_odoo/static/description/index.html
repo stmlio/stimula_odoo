@@ -9,9 +9,6 @@
             STML, or Simple Table Mapping Language, is a standardized language designed for mapping data between CSV files and SQL databases. It forms the foundation for data import and export,
             enabling data analysts and developers to define fields, transformations, foreign key resolutions, and row selections in a simple, repeatable, and reusable way. </p>
     </div>
-</section>
-
-<section class="oe_container">
     <div class="oe_row oe_spaced">
         <h2 class="oe_slogan" style="color:#875A7B;">Local Installation</h2>
         <h3 class="oe_slogan">Follow the steps below to install the Stimula for Odoo module on a local Odoo instance:</h3>
@@ -23,9 +20,6 @@
         <p class="oe_mb32" style="margin-left:48px;">3. Login to Odoo and activate the stimula_odoo module.</p>
         <p class="oe_mb32" style="margin-left:48px;">4. Use the following endpoint to verify the module was installed correctly: <a href="http://localhost:8069/stimula/1.0/hello">http://localhost:8069/stimula/1.0/hello</a></p>
     </div>
-</section>
-
-<section class="oe_container">
     <div class="oe_row oe_spaced">
         <h2 class="oe_slogan" style="color:#875A7B;">Installation on odoo.sh</h2>
         <h3 class="oe_slogan">Follow the steps below to install the Stimula for Odoo module on Odoo.sh:</h3>
@@ -37,9 +31,6 @@
         <p class="oe_mb32" style="margin-left:48px;">3. Login to Odoo and activate the module.</p>
         <p class="oe_mb32" style="margin-left:48px;">4. Use the following endpoint to verify the module was installed correctly: <a href="https://your-database-name.dev.odoo.com/stimula/1.0/hello">https://your-database-name.dev.odoo.com</a></p>
     </div>
-</section>
-
-<section class="oe_container">
     <div class="oe_row oe_spaced">
         <h2 class="oe_slogan" style="color:#875A7B;">Optional configuration</h2>
         <h3 class="oe_slogan">The module supports the following system configuration parameters:</h3>
@@ -49,17 +40,13 @@
         <p class="oe_mb32" style="margin-left:48px;"><b>stimula_odoo.secret_key</b>: This is the secret key to encrypt and sign access tokens. Thee module automatically generates a random secret key during first use.</p>
         <p class="oe_mb32" style="margin-left:48px;"><b>stimula_odoo.token_lifetime</b>: This is the access token lifetime in seconds. The default value is 24 hours.</p>
     </div>
-</section>
-
-
-<section class="oe_container">
     <div class="oe_row oe_spaced">
         <h2 class="oe_slogan" style="color:#875A7B;">Multi tenant setup</h2>
         <h3 class="oe_slogan">This module supports a multi-tenant configuration with multiple databases per Odoo instance.</h3>
     </div>
     <div class="oe_span6 text-justify oe_mt32">
         <span class="fa fa-search fa-2x pull-left"/>
-        <p class="oe_mb32" style="margin-left:48px;">If your planning to run multiple databases, then make sure that the module’s endpoints are available
+        <p class="oe_mb32" style="margin-left:48px;">If you're planning to run multiple databases in your Odoo instance, then make sure that the module’s endpoints are available
     across all database by adding the module to your list of server-wide modules in odoo.conf. For example as follows:</p>
         <p class="oe_mb32" style="margin-left:48px;">server_wide_modules = web,stimula_odoo</p>
         <p class="oe_mb32" style="margin-left:48px;">In a multi-tenant setup, each database has its own secret key. By default the secret keys are different on eacht database, so a user can use a Stimula access token only on a single database.
