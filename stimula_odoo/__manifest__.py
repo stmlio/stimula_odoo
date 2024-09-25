@@ -13,7 +13,7 @@
     ''',
     'website': 'https://www.stml.io/odoo_module',
     'external_dependencies': {
-        'python': ['stimula>=1.0.0'],
+        'python': ['stimula'],
     },
     'data': [
     ],
