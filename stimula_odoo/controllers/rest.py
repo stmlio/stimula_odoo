@@ -85,10 +85,11 @@ def authentication_handler(f):
         token = authorization_header[len('Bearer '):]
 
         # validate the token
-        database, uid = StimulaController._auth.validate_token(token)
+        database, uid, username = StimulaController._auth.validate_token(token)
 
         cnx_context.database = database
         cnx_context.uid = uid
+        cnx_context.username = username
 
         return f(*args, **kwargs)
 
