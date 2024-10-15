@@ -27,15 +27,24 @@ from odoo.service import security
 
 
 class OdooAuth(Auth):
-    # set the secret key during instantiation
+    # set the secret key function during instantiation
     def __init__(self, secret_key_function, lifetime_function):
         super().__init__(secret_key_function, lifetime_function)
 
     def _validate_submitted_credentials(self, database, username, password):
         registry = Registry(database)
 
+        # create credential object for password auth
+        credential = {'type': 'password', 'login': username, 'password': password}
+
+        # create empty user agent environment object
         wsgienv = {}
-        uid = registry['res.users'].authenticate(database, username, password, wsgienv)
+
+        # authenticate user
+        auth_info = registry['res.users'].authenticate(database, credential, wsgienv)
+
+        # get uid
+        uid = auth_info['uid']
 
         # verify odoo credentials
         security.check(database, uid, password)
