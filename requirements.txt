@@ -1,4 +1,4 @@
-stimula-dev>=1.1.3-dev1
+stimula-dev>=1.1.3-dev2
 pandas>=2.1.3
 numpy>=1.22.4
 
