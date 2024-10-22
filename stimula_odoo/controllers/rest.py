@@ -119,12 +119,14 @@ def connection_handler(f):
 
 class StimulaController(http.Controller):
     def __init__(self):
+        _logger.log(logging.INFO, 'StimulaController.__init__')
         # create an OdooAuth object with functions to retrieve secret key and token lifetime
         StimulaController._auth = OdooAuth(self.get_secret_key, self.get_token_lifetime)
         # create an OdooORM object with a function to retrieve the current environment
         self._db = DB(orm_function=self._orm_function)
 
     def _orm_function(self):
+        _logger.log(logging.INFO, 'StimulaController._orm_function')
         # Create an environment with the current context and new user
         env = api.Environment(cnx_context.cr, cnx_context.uid, {})
         return OdooORM(env)
