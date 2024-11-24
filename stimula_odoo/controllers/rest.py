@@ -348,20 +348,24 @@ class StimulaController(http.Controller):
         # get files from multipart request body
         files = request.httprequest.files
 
-        # get context names from filenames
-        context = [file.filename for file in files.values()]
+        # get context names from filenames, exclude substitutions file
+        context = [file.filename for file in files.values() if file.filename != 'substitutions.csv']
 
-        # get contents from files
-        contents = [file.stream.read() for file in files.values()]
+        # get contents from files, exclude substitutions file
+        contents = [file.stream.read() for file in files.values() if file.filename != 'substitutions.csv']
+
+        # get substitutions file if it exists
+        substitutions_file = files.get('substitutions')
+        substitutions = substitutions_file.stream.read() if substitutions_file else None
 
         # verify that table names were given for all files
         assert tables is not None, "Provide table names using the '-t' parameter"
         table_list = tables.split(',')
-        assert tables is not None and len(table_list) == len(files), "Provide exactly one file per table, not %s" % len(files)
+        assert tables is not None and len(table_list) == len(contents), "Provide exactly one file per table, not %s" % len(files)
 
         # get diff, create sql, execute if requested and return a full report in json format
         post_result = self._db.post_multiple_tables_get_full_report(table_list, header, None, contents, skiprows=1, insert=insert, update=update, delete=delete, execute=execute, commit=commit,
-                                                                    context=context)
+                                                                    context=context, substitutions=substitutions)
         # create json response
         response = request.make_json_response(post_result)
         return response
