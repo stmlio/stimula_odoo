@@ -369,3 +369,4 @@ class StimulaController(http.Controller):
         # create json response
         response = request.make_json_response(post_result)
         return response
+
