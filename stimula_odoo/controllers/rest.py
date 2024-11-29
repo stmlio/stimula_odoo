@@ -354,9 +354,9 @@ class StimulaController(http.Controller):
         # get contents from files, exclude substitutions file
         contents = [file.stream.read() for file in files.values() if file.filename != 'substitutions.csv']
 
-        # get substitutions file if it exists
-        substitutions_file = files.get('substitutions')
-        substitutions = substitutions_file.stream.read() if substitutions_file else None
+        # get substitutions file by filename, if it exists
+        substitutions_files = [f for f in files.values() if f.filename == 'substitutions.csv']
+        substitutions = substitutions_files[0].stream.read() if len(substitutions_files) > 0 else None
 
         # verify that table names were given for all files
         assert tables is not None, "Provide table names using the '-t' parameter"
