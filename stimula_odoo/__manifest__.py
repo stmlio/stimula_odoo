@@ -1,6 +1,6 @@
 {
     'name': 'Stimula for Odoo',
-    'version': '1.2.11',
+    'version': '1.2.12',
     'depends': ['base'],
     'author': 'STML.IO',
     'category': 'Extra Tools',
