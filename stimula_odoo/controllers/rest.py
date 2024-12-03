@@ -295,7 +295,8 @@ class StimulaController(http.Controller):
 
         if style == 'diff':
             # get diff, create sql and execute if requested and return three data frames separated by two newlines
-            post_result = self._db.post_table_get_diff(table_name, header, where_clause, body, skiprows=skiprows, nrows=nrows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
+            post_result = self._db.post_table_get_diff(table_name, header, where_clause, body, skiprows=skiprows, nrows=nrows, insert=insert, update=update, delete=delete, execute=execute,
+                                                       commit=commit)
             response_body = '\n\n'.join([df.to_csv(index=False) for df in post_result])
             # Set headers
             response = request.make_response(response_body)
@@ -305,7 +306,8 @@ class StimulaController(http.Controller):
 
         if style == 'sql':
             # get diff, create sql, execute if requested and return a single data frame
-            post_result = self._db.post_table_get_sql(table_name, header, where_clause, body, skiprows=skiprows, nrows=nrows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
+            post_result = self._db.post_table_get_sql(table_name, header, where_clause, body, skiprows=skiprows, nrows=nrows, insert=insert, update=update, delete=delete, execute=execute,
+                                                      commit=commit)
             # convert df to response body, use double quotes where needed
             response_body = post_result.to_csv(index=False, quotechar="\"")
             # Set headers
@@ -316,14 +318,16 @@ class StimulaController(http.Controller):
 
         if style == 'summary':
             # get diff, create sql, execute if requested and return a summary in json format
-            post_result = self._db.post_table_get_summary(table_name, header, where_clause, body, skiprows=skiprows, nrows=nrows, insert=insert, update=update, delete=delete, execute=execute, commit=commit)
+            post_result = self._db.post_table_get_summary(table_name, header, where_clause, body, skiprows=skiprows, nrows=nrows, insert=insert, update=update, delete=delete, execute=execute,
+                                                          commit=commit)
             # convert df to response body, use double quotes where needed
             response = request.make_response(post_result)
             return response
 
         if style == 'full':
             # get diff, create sql, execute if requested and return a full report in json format
-            post_result = self._db.post_table_get_full_report(table_name, header, where_clause, body, skiprows=skiprows, nrows=nrows, insert=insert, update=update, delete=delete, execute=execute, commit=commit,
+            post_result = self._db.post_table_get_full_report(table_name, header, where_clause, body, skiprows=skiprows, nrows=nrows, insert=insert, update=update, delete=delete, execute=execute,
+                                                              commit=commit,
                                                               context=context)
             # create json response
             response = request.make_json_response(post_result)
@@ -367,9 +371,9 @@ class StimulaController(http.Controller):
         assert tables is not None and len(table_list) == len(contents), "Provide exactly one file per table, not %s" % len(files)
 
         # get diff, create sql, execute if requested and return a full report in json format
-        post_result = self._db.post_multiple_tables_get_full_report(table_list, header, None, contents, skiprows=skiprows, nrows=nrows, insert=insert, update=update, delete=delete, execute=execute, commit=commit,
+        post_result = self._db.post_multiple_tables_get_full_report(table_list, header, None, contents, skiprows=skiprows, nrows=nrows, insert=insert, update=update, delete=delete, execute=execute,
+                                                                    commit=commit,
                                                                     context=context, substitutions=substitutions)
         # create json response
         response = request.make_json_response(post_result)
         return response
-
